@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_localizations/flutter_localizations.dart'; // ← AÑADE ESTE IMPORT
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:taskmaster_app/app_router.dart';
@@ -15,7 +15,44 @@ import 'package:taskmaster_app/presentation/providers/weather_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
+  
+  // ⭐⭐ AÑADE ESTOS LOGS DE DEBUG ⭐⭐
+  print('=' * 60);
+  print('🚀 INICIANDO APLICACIÓN TASKMASTER');
+  print('=' * 60);
+  
+  // 1. Cargar variables de entorno
+  try {
+    await dotenv.load(fileName: ".env");
+    print('✅ Archivo .env cargado correctamente');
+  } catch (e) {
+    print('❌ Error cargando .env: $e');
+  }
+  
+  // 2. Verificar variables específicas
+  print('\n🔍 VERIFICANDO VARIABLES DE ENTORNO:');
+  
+  final openWeatherKey = dotenv.get('OPENWEATHER_API_KEY', fallback: 'NO_ENCONTRADA');
+  print('🌤️  OPENWEATHER_API_KEY:');
+  print('   • Presente: ${openWeatherKey != 'NO_ENCONTRADA' ? '✅' : '❌'}');
+  print('   • Longitud: ${openWeatherKey.length} caracteres');
+  
+  if (openWeatherKey.length >= 32) {
+    print('   • Formato: ✅ Válido (32+ caracteres)');
+    // Mostrar solo primeros y últimos caracteres por seguridad
+    final maskedKey = '${openWeatherKey.substring(0, 4)}...${openWeatherKey.substring(openWeatherKey.length - 4)}';
+    print('   • Valor: $maskedKey');
+  } else if (openWeatherKey.isNotEmpty) {
+    print('   • Formato: ❌ Debe tener al menos 32 caracteres');
+  } else {
+    print('   • Formato: ❌ Vacía o no encontrada');
+  }
+  
+  final apiBaseUrl = dotenv.get('API_BASE_URL', fallback: 'NO_ENCONTRADA');
+  print('\n🌐 API_BASE_URL: $apiBaseUrl');
+  
+  print('\n' + '=' * 60);
+  
   await LocalStorage.init();
   runApp(const MyApp());
 }
@@ -29,6 +66,10 @@ class MyApp extends StatelessWidget {
     final authService = AuthService();
     final taskService = TaskService();
     final weatherService = WeatherService(client: http.Client());
+    
+    // Debug adicional
+    print('🏗️  Construyendo MyApp...');
+    print('🔧 WeatherService creado: ${weatherService != null}');
     
     return MultiProvider(
       providers: [
@@ -66,7 +107,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         
-        // ⭐⭐ AÑADE ESTAS LÍNEAS PARA LAS LOCALIZACIONES ⭐⭐
+        // Localizaciones
         locale: const Locale('es', 'ES'),
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
