@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // Cargar datos iniciales
     await taskProvider.loadTasks();
-    await weatherProvider.getWeatherByCity('Madrid');
+    await weatherProvider.getWeatherByCity('México');
   }
 
   @override
@@ -41,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('TaskMaster'),
+        title: const Text('nOWte.app'),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -110,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Bienvenido a TaskMaster',
+                    'Bienvenido a nOWte.app',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Colors.grey.shade600,
                     ),

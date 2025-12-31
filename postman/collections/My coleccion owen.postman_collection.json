@@ -1,0 +1,373 @@
+{
+  "info": {
+    "_postman_id": "82081a44-a8e3-4f90-a531-2e4b4563e6ca",
+    "name": "My coleccion owen",
+    "description": "Pruebas de apis backent",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Crear tarea",
+      "id": "3df0e02e-75a5-4a2e-bebb-f04e511fb07d",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJPd2VuWmFyYXRlIiwiZW1haWwiOiJvemFyYXRlMDI1QGdtYWlsLmNvbSIsImlhdCI6MTc2NzEyMjg5MCwiZXhwIjoxNzY3NzI3NjkwfQ.o6cfirQKClKixKrdDUb86Sb_iJDQQwE4fW1R4DIQ6WM",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text",
+            "uuid": "9b790fe8-b466-4791-a8e5-ac18e7665c9c"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer yJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJPd2VuWmFyYXRlIiwiZW1haWwiOiJvemFyYXRlMDI1QGdtYWlsLmNvbSIsImlhdCI6MTc2Njk1MDkzNywiZXhwIjoxNzY3NTU1NzM3fQ.ORSGBJHxBbGiBuEqlNrR7CmiB6OkMOCenkJJEjrcOZU",
+            "type": "text",
+            "uuid": "c1cd1e02-fe72-41fc-819d-38cc4ec0c456"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"titulo\": \"Mi primera tarea\",\r\n    \"descripcion\": \"Esto es una descripción de prueba\",\r\n    \"prioridad\": \"alta\",\r\n    \"estado\": \"pendiente\",\r\n    \"fecha_limite\": \"2024-12-31T10:00:00Z\"\r\n  }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/tasks",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "tasks"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Consultar todas las tareas",
+      "id": "e5f3bfc6-a8d4-47f4-9c55-ae06da209371",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJPd2VuWmFyYXRlIiwiZW1haWwiOiJvemFyYXRlMDI1QGdtYWlsLmNvbSIsImlhdCI6MTc2NzEyMjg5MCwiZXhwIjoxNzY3NzI3NjkwfQ.o6cfirQKClKixKrdDUb86Sb_iJDQQwE4fW1R4DIQ6WM",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text",
+            "uuid": "142b5417-d4b8-4f1f-8d03-c3f5500b16b6"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer yJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJPd2VuWmFyYXRlIiwiZW1haWwiOiJvemFyYXRlMDI1QGdtYWlsLmNvbSIsImlhdCI6MTc2Njk1MDkzNywiZXhwIjoxNzY3NTU1NzM3fQ.ORSGBJHxBbGiBuEqlNrR7CmiB6OkMOCenkJJEjrcOZU",
+            "type": "text",
+            "uuid": "e5b16e05-58c0-4a5a-9be8-a897305ebee6"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"titulo\": \"Mi primera tarea\",\r\n    \"descripcion\": \"Esto es una descripción de prueba\",\r\n    \"prioridad\": \"alta\",\r\n    \"estado\": \"pendiente\",\r\n    \"fecha_limite\": \"2024-12-31T10:00:00Z\"\r\n  }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/tasks",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "tasks"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login",
+      "id": "b269c2f4-e1b1-4c7b-aad7-59bfadb510f3",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"email\": \"ozarate025@gmail.com\",\r\n    \"password\": \"ZowenZ2525\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/auth/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Registrar usuario",
+      "id": "f9ab7bc8-3820-4de7-bcc4-ca47267d7d26",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"username\": \"OwenZarate\",\r\n    \"email\": \"ozarate025@gmail.com\",\r\n    \"password\": \"ZowenZ2525\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/auth/register",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Eliminar tarea",
+      "id": "a1c95dcb-d29d-4eaf-ad5f-cb105a6a463a",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJPd2VuWmFyYXRlIiwiZW1haWwiOiJvemFyYXRlMDI1QGdtYWlsLmNvbSIsImlhdCI6MTc2Njk1MDkzNywiZXhwIjoxNzY3NTU1NzM3fQ.ORSGBJHxBbGiBuEqlNrR7CmiB6OkMOCenkJJEjrcOZU",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text",
+            "uuid": "765c1a6e-efb3-4b5c-8b64-54451eb156f6"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer yJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJPd2VuWmFyYXRlIiwiZW1haWwiOiJvemFyYXRlMDI1QGdtYWlsLmNvbSIsImlhdCI6MTc2Njk1MDkzNywiZXhwIjoxNzY3NTU1NzM3fQ.ORSGBJHxBbGiBuEqlNrR7CmiB6OkMOCenkJJEjrcOZU",
+            "type": "text",
+            "uuid": "fccdafef-97a5-4a3f-9bbe-6bb9f80b9eba"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"titulo\": \"Mi primera tarea\",\r\n    \"descripcion\": \"Esto es una descripción de prueba\",\r\n    \"prioridad\": \"alta\",\r\n    \"estado\": \"pendiente\",\r\n    \"fecha_limite\": \"2024-12-31T10:00:00Z\"\r\n  }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/tasks/5",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "tasks",
+            "5"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Consultar tarea en especifico",
+      "id": "480d295d-a1ed-4dd1-9b60-54e12a94ecb1",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJPd2VuWmFyYXRlIiwiZW1haWwiOiJvemFyYXRlMDI1QGdtYWlsLmNvbSIsImlhdCI6MTc2NzIxMjY1OCwiZXhwIjoxNzY3ODE3NDU4fQ.HMxGD86TRVjF5hP44RE-WwQjClpBirfAPQi3cJnaoWM",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text",
+            "uuid": "5df86f52-ee9f-4ffc-9516-555a7242f855"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer yJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJPd2VuWmFyYXRlIiwiZW1haWwiOiJvemFyYXRlMDI1QGdtYWlsLmNvbSIsImlhdCI6MTc2Njk1MDkzNywiZXhwIjoxNzY3NTU1NzM3fQ.ORSGBJHxBbGiBuEqlNrR7CmiB6OkMOCenkJJEjrcOZU",
+            "type": "text",
+            "uuid": "06b5610a-fa33-47a0-9f19-1ffb96f80543"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"titulo\": \"Mi primera tarea\",\r\n    \"descripcion\": \"Esto es una descripción de prueba\",\r\n    \"prioridad\": \"alta\",\r\n    \"estado\": \"pendiente\",\r\n    \"fecha_limite\": \"2024-12-31T10:00:00Z\"\r\n  }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/tasks/12",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "tasks",
+            "12"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Actualizar tarea",
+      "id": "a85e702b-06ed-47bb-9267-e66da560435b",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJPd2VuWmFyYXRlIiwiZW1haWwiOiJvemFyYXRlMDI1QGdtYWlsLmNvbSIsImlhdCI6MTc2NzEyMjg5MCwiZXhwIjoxNzY3NzI3NjkwfQ.o6cfirQKClKixKrdDUb86Sb_iJDQQwE4fW1R4DIQ6WM",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text",
+            "uuid": "af4e5b16-d3e2-421a-93f2-2b30a2984933"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer yJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJPd2VuWmFyYXRlIiwiZW1haWwiOiJvemFyYXRlMDI1QGdtYWlsLmNvbSIsImlhdCI6MTc2Njk1MDkzNywiZXhwIjoxNzY3NTU1NzM3fQ.ORSGBJHxBbGiBuEqlNrR7CmiB6OkMOCenkJJEjrcOZU",
+            "type": "text",
+            "uuid": "7b89d49b-bba0-4730-8e7d-c1c3a248f321"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"titulo\": \"Mi tarea actualizada\",\r\n    \"descripcion\": \"Esto no es una descripción de prueba\",\r\n    \"prioridad\": \"alta\",\r\n    \"estado\": \"pendiente\",\r\n    \"fecha_limite\": \"2028-12-31T10:00:00Z\"\r\n  }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/tasks/15",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "tasks",
+            "15"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "New Request",
+      "id": "0721b042-afef-4747-a9ff-cee1874b6591",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    }
+  ]
+}

@@ -29,7 +29,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
   Future<void> _loadInitialWeather() async {
     final weatherProvider = context.read<WeatherProvider>();
     if (weatherProvider.currentWeather == null) {
-      await weatherProvider.getWeatherByCity('Madrid');
+      await weatherProvider.getWeatherByCity('Ecatepec de Morelos');
     }
   }
 
@@ -115,7 +115,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
                   child: TextField(
                     controller: _cityController,
                     decoration: InputDecoration(
-                      hintText: 'Ej: Madrid, Barcelona, Londres...',
+                      hintText: 'Ej: México, Japón, Londres...',
                       border: const OutlineInputBorder(),
                       suffixIcon: _cityController.text.isNotEmpty
                           ? IconButton(
@@ -401,7 +401,7 @@ class _WeatherScreenState extends State<WeatherScreen> {
   }
 
   Widget _buildCommonCities() {
-    final cities = ['Madrid', 'Barcelona', 'Valencia', 'Sevilla', 'Bilbao'];
+    final cities = ['Ecatepec de Morelos', 'Puebla', 'Monterrey', 'Guerrero', 'Tijuana'];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

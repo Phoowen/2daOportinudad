@@ -108,7 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         const SizedBox(height: 20),
         Text(
-          'TaskMaster',
+          'nOWte.app',
           style: Theme.of(context).textTheme.headlineLarge?.copyWith(
             fontWeight: FontWeight.bold,
             color: Colors.blue.shade800,
@@ -116,7 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          'Gestión de tareas inteligente',
+          'Bienvenido al módulo de gestión de tareas inteligente',
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
             color: Colors.grey.shade600,
           ),
