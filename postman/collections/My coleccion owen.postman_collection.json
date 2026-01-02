@@ -368,6 +368,40 @@
         }
       },
       "response": []
+    },
+    {
+      "name": "Registrar usuario Copy",
+      "id": "6e10de14-5760-44b0-a3ae-f1db65b076c3",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"username\": \"OwenZarate\",\r\n    \"email\": \"ozarate025@gmail.com\",\r\n    \"password\": \"ZowenZ2525\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/auth/register",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "response": []
     }
   ]
 }

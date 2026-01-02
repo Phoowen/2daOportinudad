@@ -24,38 +24,38 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _login() async {
-  if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) return;
 
-  final authProvider = context.read<AuthProvider>();
-  
-  print('🔄 Iniciando login con:');
-  print('   📧 Email: ${_emailController.text}');
-  print('   🔐 Password: ${_passwordController.text}');
-  
-  final success = await authProvider.login(
-    email: _emailController.text.trim(),
-    password: _passwordController.text,
-  );
+    final authProvider = context.read<AuthProvider>();
 
-  if (success && context.mounted) {
-    print('✅ Login exitoso!');
-    print('   🎫 Token: ${authProvider.token?.substring(0, 20)}...');
-    print('   👤 Usuario: ${authProvider.user?.username}');
-    
-    // Navegar al home
-    context.go('/home');
-  } else if (context.mounted) {
-    print('❌ Login falló');
-    print('   💥 Error: ${authProvider.error}');
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(authProvider.error ?? 'Error en el login'),
-        backgroundColor: Colors.red,
-      ),
+    print('🔄 Iniciando login con:');
+    print('   📧 Email: ${_emailController.text}');
+    print('   🔐 Password: ${_passwordController.text}');
+
+    final success = await authProvider.login(
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
     );
+
+    if (success && context.mounted) {
+      print('✅ Login exitoso!');
+      print('   🎫 Token: ${authProvider.token?.substring(0, 20)}...');
+      print('   👤 Usuario: ${authProvider.user?.username}');
+
+      // Navegar al home
+      context.go('/home');
+    } else if (context.mounted) {
+      print('❌ Login falló');
+      print('   💥 Error: ${authProvider.error}');
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(authProvider.error ?? 'Error en el login'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -68,20 +68,13 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Logo y título
               const SizedBox(height: 40),
               _buildLogo(),
               const SizedBox(height: 40),
-              
-              // Formulario
               _buildForm(authProvider),
               const SizedBox(height: 32),
-              
-              // Botón de login
               _buildLoginButton(authProvider),
               const SizedBox(height: 24),
-              
-              // Link a registro
               _buildRegisterLink(),
             ],
           ),
@@ -91,39 +84,72 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildLogo() {
-    return Column(
-      children: [
-        Container(
-          width: 100,
-          height: 100,
-          decoration: BoxDecoration(
-            color: Colors.blue.shade800,
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(
-            Icons.task_alt,
-            size: 60,
-            color: Colors.white,
+  return Column(
+    children: [
+      // Logo con tu imagen personalizada
+      Container(
+        width: 120,
+        height: 120,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 15,
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Image.asset(
+            'assets/images/logo.png',
+            fit: BoxFit.cover,  // Cambia a 'contain' si quieres ver todo el logo
+            errorBuilder: (context, error, stackTrace) {
+              // Fallback en caso de que la imagen no se encuentre
+              return Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFF6366F1),
+                      Color(0xFF8B5CF6),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Center(
+                  child: Icon(
+                    Icons.task_alt,
+                    size: 60,
+                    color: Colors.white,
+                  ),
+                ),
+              );
+            },
           ),
         ),
-        const SizedBox(height: 20),
-        Text(
-          'nOWte.app',
-          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: Colors.blue.shade800,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Bienvenido al módulo de gestión de tareas inteligente',
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: Colors.grey.shade600,
-          ),
-        ),
-      ],
-    );
-  }
+      ),
+      const SizedBox(height: 40),
+      Text(
+        'nOWte.app',
+        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF1E3A8A),
+              fontSize: 32,
+            ),
+      ),
+      const SizedBox(height: 8),
+      Text(
+        'Organiza, prioriza, ejecuta',
+        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              color: Colors.grey.shade600,
+            ),
+      ),
+    ],
+  );
+}
 
   Widget _buildForm(AuthProvider authProvider) {
     return Form(
@@ -131,19 +157,27 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Email
           Text(
             'Email',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade700,
+                ),
           ),
           const SizedBox(height: 8),
           TextFormField(
             controller: _emailController,
-            decoration: const InputDecoration(
-              hintText: 'ejemplo@email.com',
-              prefixIcon: Icon(Icons.email),
+            decoration: InputDecoration(
+              hintText: 'tu@email.com',
+              prefixIcon: const Icon(Icons.email_outlined),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey.shade300),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Color(0xFF6366F1), width: 2),
+              ),
             ),
             keyboardType: TextInputType.emailAddress,
             autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -158,29 +192,39 @@ class _LoginScreenState extends State<LoginScreen> {
             },
           ),
           const SizedBox(height: 20),
-          
-          // Contraseña
           Text(
             'Contraseña',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade700,
+                ),
           ),
           const SizedBox(height: 8),
           TextFormField(
             controller: _passwordController,
             decoration: InputDecoration(
-              hintText: 'Tu contraseña',
-              prefixIcon: const Icon(Icons.lock),
+              hintText: '••••••••',
+              prefixIcon: const Icon(Icons.lock_outline),
               suffixIcon: IconButton(
                 icon: Icon(
-                  _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                  _obscurePassword 
+                      ? Icons.visibility_outlined 
+                      : Icons.visibility_off_outlined,
+                  color: Colors.grey.shade600,
                 ),
                 onPressed: () {
                   setState(() {
                     _obscurePassword = !_obscurePassword;
                   });
                 },
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.grey.shade300),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Color(0xFF6366F1), width: 2),
               ),
             ),
             obscureText: _obscurePassword,
@@ -194,8 +238,6 @@ class _LoginScreenState extends State<LoginScreen> {
               return null;
             },
           ),
-          
-          // Error si hay
           if (authProvider.error != null) ...[
             const SizedBox(height: 16),
             Container(
@@ -207,7 +249,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.error, color: Colors.red),
+                  const Icon(Icons.error_outline, color: Colors.red),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
@@ -228,12 +270,18 @@ class _LoginScreenState extends State<LoginScreen> {
     return ElevatedButton(
       onPressed: authProvider.isLoading ? null : _login,
       style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: const EdgeInsets.symmetric(vertical: 18),
+        backgroundColor: const Color(0xFF6366F1),
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 0,
       ),
       child: authProvider.isLoading
           ? const SizedBox(
-              height: 20,
-              width: 20,
+              height: 24,
+              width: 24,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
                 valueColor: AlwaysStoppedAnimation(Colors.white),
@@ -241,7 +289,10 @@ class _LoginScreenState extends State<LoginScreen> {
             )
           : const Text(
               'Iniciar Sesión',
-              style: TextStyle(fontSize: 16),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
     );
   }
@@ -256,7 +307,17 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         TextButton(
           onPressed: () => context.go('/register'),
-          child: const Text('Regístrate aquí'),
+          style: TextButton.styleFrom(
+            padding: EdgeInsets.zero,
+            minimumSize: const Size(50, 30),
+          ),
+          child: const Text(
+            'Regístrate aquí',
+            style: TextStyle(
+              color: Color(0xFF6366F1),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
       ],
     );

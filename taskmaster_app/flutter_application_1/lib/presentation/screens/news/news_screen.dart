@@ -365,7 +365,7 @@ class _NewsScreenState extends State<NewsScreen> {
     );
   }
 
-  Future<void> _launchInBrowser(String url) async {
+  /*Future<void> _launchInBrowser(String url) async {
     final uri = Uri.parse(url);
     try {
       if (await canLaunchUrl(uri)) {
@@ -381,7 +381,28 @@ class _NewsScreenState extends State<NewsScreen> {
     } catch (e) {
       _showSnackBar('Error: $e', isError: true);
     }
+  }*/
+  Future<void> _launchInBrowser(String url) async {
+  final uri = Uri.parse(url);
+  
+  print('🔗 Intentando abrir URL: $url');
+  
+  try {
+    if (await canLaunchUrl(uri)) {
+      print('✅ URL lanzable, abriendo...');
+      await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication, // Cambia esto
+      );
+    } else {
+      print('❌ No se puede lanzar la URL: $url');
+      _showSnackBar('No se pudo abrir el enlace: $url', isError: true);
+    }
+  } catch (e) {
+    print('❌ Error al abrir URL: $e');
+    _showSnackBar('Error: $e', isError: true);
   }
+}
 
   void _copyToClipboard(String text) {
     Clipboard.setData(ClipboardData(text: text));

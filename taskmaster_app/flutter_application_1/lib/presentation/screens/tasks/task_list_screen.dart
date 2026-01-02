@@ -256,11 +256,11 @@ class _TaskListScreenState extends State<TaskListScreen> {
                 ),
                 _buildFilterChip(
                   'Completadas',
-                  _selectedStatus == 'completada',
-                  color: AppTheme.getStatusColor('completada', isDark: isDark),
+                  _selectedStatus == 'hecha',
+                  color: AppTheme.getStatusColor('hecha', isDark: isDark),
                   onSelected: (_) {
                     setState(() {
-                      _selectedStatus = 'completada';
+                      _selectedStatus = 'hecha';
                       _selectedPriority = null;
                     });
                     _applyFilters();
@@ -277,17 +277,6 @@ class _TaskListScreenState extends State<TaskListScreen> {
                       _selectedPriority = 'alta';
                     });
                     _applyFilters();
-                  },
-                  isDark: isDark,
-                ),
-                _buildFilterChip(
-                  'Urgentes',
-                  false,
-                  color: AppTheme.errorColor,
-                  icon: Icons.warning,
-                  onSelected: (_) {
-                    // Filtrar tareas con fecha límite cercana
-                    // Implementación avanzada
                   },
                   isDark: isDark,
                 ),
