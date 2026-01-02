@@ -10,7 +10,7 @@ class TaskMasterApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'TaskMaster',
+      title: 'nOWte.app',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: const LoginScreen(),
     );
@@ -118,7 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('TaskMaster - Login')),
+      appBar: AppBar(title: const Text('nOWte.app - Login')),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(

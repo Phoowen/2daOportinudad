@@ -3,15 +3,15 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
-import 'package:taskmaster_app/app_router.dart';
+import 'package:taskmaster_app/app_router.dart'; // Ruta corregida
 import 'package:taskmaster_app/core/theme/app_theme.dart';
 import 'package:taskmaster_app/data/repositories/local_storage.dart';
 import 'package:taskmaster_app/data/services/auth_service.dart';
-import 'package:taskmaster_app/data/services/news_service.dart'; // NUEVO IMPORT
+import 'package:taskmaster_app/data/services/news_service.dart';
 import 'package:taskmaster_app/data/services/task_service.dart';
 import 'package:taskmaster_app/data/services/weather_service.dart';
 import 'package:taskmaster_app/presentation/providers/auth_provider.dart';
-import 'package:taskmaster_app/presentation/providers/news_provider.dart'; // NUEVO IMPORT
+import 'package:taskmaster_app/presentation/providers/news_provider.dart';
 import 'package:taskmaster_app/presentation/providers/task_provider.dart';
 import 'package:taskmaster_app/presentation/providers/weather_provider.dart';
 
@@ -27,15 +27,16 @@ void main() async {
     await dotenv.load(fileName: ".env");
     print('✅ Archivo .env cargado correctamente');
   } catch (e) {
-    print('❌ Error cargando .env: $e');
+    print('⚠️  Advertencia: No se pudo cargar .env: $e');
+    print('💡 Usando valores por defecto para desarrollo');
   }
   
   // 2. Verificar variables específicas
   print('\n🔍 VERIFICANDO VARIABLES DE ENTORNO:');
   
-  final openWeatherKey = dotenv.get('OPENWEATHER_API_KEY', fallback: 'NO_ENCONTRADA');
+  final openWeatherKey = dotenv.maybeGet('OPENWEATHER_API_KEY') ?? '';
   print('🌤️  OPENWEATHER_API_KEY:');
-  print('   • Presente: ${openWeatherKey != 'NO_ENCONTRADA' ? '✅' : '❌'}');
+  print('   • Presente: ${openWeatherKey.isNotEmpty ? '✅' : '❌'}');
   print('   • Longitud: ${openWeatherKey.length} caracteres');
   
   if (openWeatherKey.length >= 32) {
@@ -48,28 +49,37 @@ void main() async {
     print('   • Formato: ❌ Vacía o no encontrada');
   }
   
-  // NUEVO: Verificar NewsAPI Key
-  final newsApiKey = dotenv.get('NEWS_API_KEY', fallback: 'NO_ENCONTRADA');
+  // NewsAPI Key - Manejo mejorado
+  final newsApiKey = dotenv.maybeGet('NEWS_API_KEY') ?? '';
   print('\n📰 NEWS_API_KEY:');
-  print('   • Presente: ${newsApiKey != 'NO_ENCONTRADA' ? '✅' : '❌'}');
+  print('   • Presente: ${newsApiKey.isNotEmpty ? '✅' : '❌'}');
   print('   • Longitud: ${newsApiKey.length} caracteres');
   
-  if (newsApiKey.length > 20) {
-    print('   • Formato: ✅ Válido');
-    final maskedKey = '${newsApiKey.substring(0, 4)}...${newsApiKey.substring(newsApiKey.length - 4)}';
-    print('   • Valor: $maskedKey');
-  } else if (newsApiKey.isNotEmpty) {
-    print('   • Formato: ❌ Demasiado corta');
+  if (newsApiKey.isNotEmpty) {
+    if (newsApiKey.length > 20) {
+      print('   • Formato: ✅ Válido');
+      final maskedKey = '${newsApiKey.substring(0, 4)}...${newsApiKey.substring(newsApiKey.length - 4)}';
+      print('   • Valor: $maskedKey');
+    } else {
+      print('   • Formato: ❌ Demasiado corta (debe tener > 20 caracteres)');
+    }
   } else {
-    print('   • Formato: ❌ Vacía o no encontrada');
+    print('   • Formato: ⚠️  No configurada (se usarán datos de ejemplo)');
   }
   
-  final apiBaseUrl = dotenv.get('API_BASE_URL', fallback: 'NO_ENCONTRADA');
+  final apiBaseUrl = dotenv.maybeGet('API_BASE_URL') ?? 'http://localhost:3000';
   print('\n🌐 API_BASE_URL: $apiBaseUrl');
   
   print('\n' + '=' * 60);
   
-  await LocalStorage.init();
+  // Inicializar almacenamiento local
+  try {
+    await LocalStorage.init();
+    print('💾 LocalStorage inicializado correctamente');
+  } catch (e) {
+    print('❌ Error inicializando LocalStorage: $e');
+  }
+  
   runApp(const MyApp());
 }
 
@@ -83,14 +93,15 @@ class MyApp extends StatelessWidget {
     final taskService = TaskService();
     final weatherService = WeatherService(client: http.Client());
     
-    // NUEVO: Servicio de noticias
+    // Servicio de noticias - con validación
+    final newsApiKey = dotenv.maybeGet('NEWS_API_KEY') ?? '';
     final newsService = NewsService(
-      apiKey: dotenv.get('NEWS_API_KEY', fallback: ''),
+      apiKey: newsApiKey.isNotEmpty ? newsApiKey : 'demo-key-for-dev', // Key dummy para desarrollo
     );
     
     print('🏗️  Construyendo MyApp...');
     print('🔧 WeatherService creado: ${weatherService != null}');
-    print('📰 NewsService creado: ${newsService != null}');
+    print('📰 NewsService creado con clave: ${newsApiKey.isNotEmpty ? "API Real" : "Datos de ejemplo"}');
     
     return MultiProvider(
       providers: [
@@ -113,7 +124,7 @@ class MyApp extends StatelessWidget {
             }
             
             if (authProvider.token != taskProvider.token) {
-              taskProvider.token = authProvider.token ?? '';
+              taskProvider.updateToken(authProvider.token ?? '');
             }
             return taskProvider;
           },
@@ -122,7 +133,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => WeatherProvider(weatherService: weatherService),
         ),
-        // NUEVO: News Provider
+        // News Provider
         ChangeNotifierProvider(
           create: (context) => NewsProvider(newsService: newsService),
         ),
@@ -131,6 +142,7 @@ class MyApp extends StatelessWidget {
         title: 'nOWte.app',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme, // Opcional: si tienes tema oscuro
         
         // Localizaciones
         locale: const Locale('es', 'ES'),
@@ -144,6 +156,7 @@ class MyApp extends StatelessWidget {
           Locale('en', 'US'), // Inglés como fallback
         ],
         
+        // Router
         routerConfig: AppRouter.router,
       ),
     );

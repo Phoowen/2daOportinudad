@@ -15,6 +15,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  int _currentIndex = 0; // Añade esta variable para controlar el índice actual
+
   @override
   void initState() {
     super.initState();
@@ -43,6 +45,15 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('nOWte.app'),
         actions: [
+          // Botón de noticias en AppBar (opcional)
+          IconButton(
+            icon: const Icon(Icons.article),
+            onPressed: () {
+              _currentIndex = 3; // Actualiza el índice
+              context.go('/news');
+            },
+            tooltip: 'Noticias',
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () async {
@@ -73,6 +84,10 @@ class _HomeScreenState extends State<HomeScreen> {
               
               // Tareas recientes
               _buildRecentTasksSection(taskProvider),
+
+              // Sección de noticias (nueva)
+              const SizedBox(height: 24),
+              _buildNewsSection(),
             ],
           ),
         ),
@@ -83,6 +98,64 @@ class _HomeScreenState extends State<HomeScreen> {
         label: const Text('Nueva Tarea'),
       ),
       bottomNavigationBar: _buildBottomNavigationBar(context),
+    );
+  }
+
+  // NUEVA SECCIÓN: Acceso rápido a noticias
+  Widget _buildNewsSection() {
+    return Card(
+      child: InkWell(
+        onTap: () {
+          _currentIndex = 3; // Actualiza el índice
+          context.go('/news');
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.article,
+                  color: Colors.blue,
+                  size: 32,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Últimas Noticias',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Mantente informado con las noticias más relevantes',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: Colors.grey,
+                size: 20,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -312,7 +385,10 @@ class _HomeScreenState extends State<HomeScreen> {
         // Botón para ver más
         IconButton(
           icon: const Icon(Icons.arrow_forward),
-          onPressed: () => context.go('/weather'),
+          onPressed: () {
+            _currentIndex = 2; // Actualiza el índice para clima
+            context.go('/weather');
+          },
         ),
       ],
     );
@@ -334,7 +410,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             TextButton(
-              onPressed: () => context.go('/tasks'),
+              onPressed: () {
+                _currentIndex = 1; // Actualiza el índice para tareas
+                context.go('/tasks');
+              },
               child: const Text('Ver todas'),
             ),
           ],
@@ -372,8 +451,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildBottomNavigationBar(BuildContext context) {
     return BottomNavigationBar(
-      currentIndex: 0,
+      currentIndex: _currentIndex,
       onTap: (index) {
+        setState(() {
+          _currentIndex = index;
+        });
+        
         switch (index) {
           case 0:
             context.go('/home');
@@ -383,6 +466,9 @@ class _HomeScreenState extends State<HomeScreen> {
             break;
           case 2:
             context.go('/weather');
+            break;
+          case 3: // NUEVO: Noticias
+            context.go('/news');
             break;
         }
       },
@@ -398,6 +484,10 @@ class _HomeScreenState extends State<HomeScreen> {
         BottomNavigationBarItem(
           icon: Icon(Icons.cloud),
           label: 'Clima',
+        ),
+        BottomNavigationBarItem( // NUEVO ITEM
+          icon: Icon(Icons.article),
+          label: 'Noticias',
         ),
       ],
     );

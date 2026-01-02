@@ -1,10 +1,12 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiConstants {
-  // Cargar variables de .env
+  // ============ URLS BASE ============
   static String get baseUrl => dotenv.get('API_BASE_URL', fallback: 'http://10.0.2.2:3000/api');
   static String get weatherBaseUrl => 'https://api.openweathermap.org/data/2.5';
-  
+  static String get newsBaseUrl => 'https://newsapi.org/v2';
+
+  // ============ API KEYS ============
   static String get weatherApiKey {
     try {
       final key = dotenv.get('OPENWEATHER_API_KEY', fallback: '');
@@ -13,17 +15,16 @@ class ApiConstants {
       }
       return key;
     } catch (e) {
-      print('❌ Error obteniendo API key: $e');
+      print('❌ Error obteniendo Weather API key: $e');
       return '';
     }
   }
 
-  // NUEVO: NewsAPI
   static String get newsApiKey {
     try {
       final key = dotenv.get('NEWS_API_KEY', fallback: '');
       if (key.isEmpty) {
-        print('⚠️ NEWS_API_KEY está vacía o no encontrada');
+        print('⚠️ NEWS_API_KEY está vacía o no encontrada - Usando datos de ejemplo');
       }
       return key;
     } catch (e) {
@@ -32,25 +33,31 @@ class ApiConstants {
     }
   }
 
-  static String get newsBaseUrl => 'https://newsapi.org/v2';
-
-  // Endpoints de autenticación
+  // ============ ENDPOINTS ============
+  // Autenticación
   static const String register = '/auth/register';
   static const String login = '/auth/login';
   static const String profile = '/auth/profile';
 
-  // Endpoints de tareas
+  // Tareas
   static const String tasks = '/tasks';
   static String taskById(String id) => '/tasks/$id';
   
-  // Endpoints de clima
+  // Clima
   static const String weather = '/weather';
 
-  // Endpoints de noticias (NUEVO)
-  static String get topHeadlines => '/top-headlines';
-  static String get everything => '/everything';
+  // Noticias
+  static const String topHeadlines = '/top-headlines';
+  static const String everything = '/everything';
 
-  // Headers
+  // ============ CONFIGURACIÓN ============
+  static const int defaultNewsPageSize = 10;
+  static const int maxNewsPageSize = 50;
+  static const String defaultNewsCountry = 'us';
+  static const String defaultNewsCategory = 'general';
+  static const String defaultNewsLanguage = 'es';
+
+  // ============ HEADERS ============
   static const Map<String, String> defaultHeaders = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -63,26 +70,39 @@ class ApiConstants {
     };
   }
 
-  // Métodos útiles para noticias
+  // ============ MÉTODOS UTILES PARA NEWS ============
   static String getNewsUrl({
     String endpoint = 'top-headlines',
     String country = 'us',
     String category = 'general',
     int pageSize = 10,
     String? query,
+    String? language,
   }) {
     final base = '$newsBaseUrl/$endpoint';
+    final params = <String>[];
     
     if (endpoint == 'top-headlines') {
-      return '$base?country=$country&category=$category&pageSize=$pageSize&apiKey=$newsApiKey';
+      params.add('country=$country');
+      params.add('category=$category');
     } else if (endpoint == 'everything' && query != null) {
-      return '$base?q=$query&pageSize=$pageSize&apiKey=$newsApiKey';
+      params.add('q=${Uri.encodeComponent(query)}');
+      if (language != null) {
+        params.add('language=$language');
+      }
     }
     
-    return base;
+    params.add('pageSize=$pageSize');
+    params.add('apiKey=$newsApiKey');
+    
+    return '$base?${params.join('&')}';
   }
 
-  // Categorías de noticias disponibles
+  static String getWeatherUrl(String city) {
+    return '$weatherBaseUrl/$weather?q=$city&appid=$weatherApiKey&units=metric&lang=es';
+  }
+
+  // ============ CATEGORÍAS DE NOTICIAS ============
   static List<String> get newsCategories => [
     'general',
     'business',
@@ -93,7 +113,7 @@ class ApiConstants {
     'technology',
   ];
 
-  // Países disponibles para noticias
+  // ============ PAÍSES DISPONIBLES ============
   static Map<String, String> get newsCountries => {
     'us': 'Estados Unidos',
     'gb': 'Reino Unido',
@@ -102,19 +122,42 @@ class ApiConstants {
     'ar': 'Argentina',
     'co': 'Colombia',
     'br': 'Brasil',
+    'fr': 'Francia',
+    'de': 'Alemania',
+    'it': 'Italia',
   };
 
-  // Convertir categoría a nombre legible
+  // ============ NOMBRES LEGIBLES ============
   static String getCategoryDisplayName(String category) {
-    switch (category) {
-      case 'business': return 'Negocios';
-      case 'entertainment': return 'Entretenimiento';
-      case 'health': return 'Salud';
-      case 'science': return 'Ciencia';
-      case 'sports': return 'Deportes';
-      case 'technology': return 'Tecnología';
-      case 'general': return 'General';
-      default: return category;
-    }
+    final names = {
+      'business': 'Negocios',
+      'entertainment': 'Entretenimiento',
+      'health': 'Salud',
+      'science': 'Ciencia',
+      'sports': 'Deportes',
+      'technology': 'Tecnología',
+      'general': 'General',
+    };
+    return names[category] ?? category;
+  }
+
+  static String getCountryDisplayName(String countryCode) {
+    return newsCountries[countryCode] ?? countryCode.toUpperCase();
+  }
+
+  // ============ VALIDACIÓN API ============
+  static bool hasWeatherApiKey() => weatherApiKey.isNotEmpty;
+  static bool hasNewsApiKey() => newsApiKey.isNotEmpty;
+  
+  static String get apiStatus {
+    final weatherOk = hasWeatherApiKey();
+    final newsOk = hasNewsApiKey();
+    
+    if (weatherOk && newsOk) return '✅ Todas las APIs configuradas';
+    if (!weatherOk && !newsOk) return '⚠️ Faltan ambas API Keys';
+    if (!weatherOk) return '⚠️ Falta Weather API Key';
+    if (!newsOk) return '⚠️ Falta News API Key (usando datos de ejemplo)';
+    
+    return '✅ APIs listas';
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:taskmaster_app/core/theme/app_theme.dart';
 import 'package:taskmaster_app/presentation/providers/weather_provider.dart';
 
 class WeatherScreen extends StatefulWidget {
@@ -54,41 +56,64 @@ class _WeatherScreenState extends State<WeatherScreen> {
   @override
   Widget build(BuildContext context) {
     final weatherProvider = context.watch<WeatherProvider>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
+        // ⭐⭐ BOTÓN DE BACK AGREGADO ⭐⭐
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: isDark ? AppTheme.textPrimaryDark : Colors.white,
+          ),
+          onPressed: () => context.go('/home'),
+          tooltip: 'Volver al inicio',
+        ),
         title: const Text('Clima Actual'),
+        backgroundColor: AppTheme.primaryColor,
+        foregroundColor: Colors.white,
+        elevation: 2,
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: Icon(
+              Icons.refresh,
+              color: Colors.white,
+            ),
             onPressed: () => weatherProvider.refreshWeather(),
+            tooltip: 'Actualizar clima',
           ),
         ],
       ),
       body: RefreshIndicator(
         onRefresh: () => weatherProvider.refreshWeather(),
+        color: AppTheme.primaryColor,
+        backgroundColor: isDark ? AppTheme.cardDark : Colors.white,
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
               // Buscador
-              _buildSearchBar(),
+              _buildSearchBar(isDark),
               const SizedBox(height: 24),
               
               // Información del clima
               if (weatherProvider.isLoading && !_isSearching)
-                const Center(child: CircularProgressIndicator())
+                Center(
+                  child: CircularProgressIndicator(
+                    color: AppTheme.primaryColor,
+                  ),
+                )
               else if (weatherProvider.error != null)
-                _buildErrorWidget(weatherProvider)
+                _buildErrorWidget(weatherProvider, isDark)
               else if (weatherProvider.currentWeather != null)
-                _buildWeatherInfo(weatherProvider)
+                _buildWeatherInfo(weatherProvider, isDark)
               else
-                _buildEmptyState(),
+                _buildEmptyState(isDark),
               
               const SizedBox(height: 24),
               
               // Ciudades comunes
-              _buildCommonCities(),
+              _buildCommonCities(isDark),
             ],
           ),
         ),
@@ -96,38 +121,81 @@ class _WeatherScreenState extends State<WeatherScreen> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(bool isDark) {
     return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      color: isDark ? AppTheme.cardDark : Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             Text(
               'Buscar Ciudad',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: isDark ? AppTheme.textPrimaryDark : AppTheme.textPrimaryLight,
               ),
             ),
             const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
-                  child: TextField(
-                    controller: _cityController,
-                    decoration: InputDecoration(
-                      hintText: 'Ej: México, Japón, Londres...',
-                      border: const OutlineInputBorder(),
-                      suffixIcon: _cityController.text.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear),
-                              onPressed: () {
-                                _cityController.clear();
-                                setState(() {});
-                              },
-                            )
-                          : null,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppTheme.primaryColor.withOpacity(0.1),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    onSubmitted: (_) => _searchWeather(),
+                    child: TextField(
+                      controller: _cityController,
+                      decoration: InputDecoration(
+                        hintText: 'Ej: México, Tokio, Londres...',
+                        hintStyle: TextStyle(
+                          color: isDark 
+                              ? AppTheme.textSecondaryDark 
+                              : AppTheme.textSecondaryLight,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: isDark ? AppTheme.surfaceDark : Colors.white,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                        suffixIcon: _cityController.text.isNotEmpty
+                            ? IconButton(
+                                icon: Icon(
+                                  Icons.clear,
+                                  color: AppTheme.errorColor,
+                                ),
+                                onPressed: () {
+                                  _cityController.clear();
+                                  setState(() {});
+                                },
+                              )
+                            : null,
+                        prefixIcon: Icon(
+                          Icons.search,
+                          color: AppTheme.primaryColor,
+                        ),
+                      ),
+                      style: TextStyle(
+                        color: isDark ? AppTheme.textPrimaryDark : AppTheme.textPrimaryLight,
+                      ),
+                      onSubmitted: (_) => _searchWeather(),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -135,6 +203,14 @@ class _WeatherScreenState extends State<WeatherScreen> {
                   onPressed: _isSearching ? null : _searchWeather,
                   icon: const Icon(Icons.search),
                   label: const Text('Buscar'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -144,31 +220,61 @@ class _WeatherScreenState extends State<WeatherScreen> {
     );
   }
 
-  Widget _buildErrorWidget(WeatherProvider weatherProvider) {
+  Widget _buildErrorWidget(WeatherProvider weatherProvider, bool isDark) {
     return Card(
-      color: Colors.red.shade50,
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      color: isDark ? AppTheme.cardDark : AppTheme.errorColor.withOpacity(0.05),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            const Icon(Icons.error_outline, size: 64, color: Colors.red),
+            Icon(
+              Icons.error_outline, 
+              size: 64, 
+              color: AppTheme.errorColor,
+            ),
             const SizedBox(height: 16),
             Text(
               'Error al obtener el clima',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: Colors.red,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.errorColor,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               weatherProvider.error ?? 'Error desconocido',
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.red),
+              style: TextStyle(
+                color: isDark ? AppTheme.textSecondaryDark : AppTheme.textSecondaryLight,
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => weatherProvider.clearError(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
               child: const Text('Intentar de nuevo'),
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: () => context.go('/home'),
+              icon: const Icon(Icons.home),
+              label: const Text('Volver al inicio'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppTheme.primaryColor,
+                side: BorderSide(color: AppTheme.primaryColor),
+              ),
             ),
           ],
         ),
@@ -176,10 +282,15 @@ class _WeatherScreenState extends State<WeatherScreen> {
     );
   }
 
-  Widget _buildWeatherInfo(WeatherProvider weatherProvider) {
+  Widget _buildWeatherInfo(WeatherProvider weatherProvider, bool isDark) {
     final weather = weatherProvider.currentWeather!;
 
     return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      color: isDark ? AppTheme.cardDark : Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -187,16 +298,19 @@ class _WeatherScreenState extends State<WeatherScreen> {
             // Ciudad y fecha
             Text(
               weather.location,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              style: TextStyle(
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
+                color: isDark ? AppTheme.textPrimaryDark : AppTheme.textPrimaryLight,
               ),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 4),
             Text(
               weather.formattedDate,
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey.shade600,
+                color: isDark ? AppTheme.textSecondaryDark : AppTheme.textSecondaryLight,
               ),
             ),
             const SizedBox(height: 24),
@@ -206,13 +320,24 @@ class _WeatherScreenState extends State<WeatherScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Icono
-                Image.network(
-                  weather.iconUrl,
-                  width: 100,
-                  height: 100,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Icon(Icons.cloud, size: 100, color: Colors.blue);
-                  },
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    gradient: AppTheme.getPrimaryGradient(isDark: isDark),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Image.network(
+                    weather.iconUrl,
+                    width: 80,
+                    height: 80,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Icon(
+                        Icons.cloud,
+                        size: 80,
+                        color: Colors.white,
+                      );
+                    },
+                  ),
                 ),
                 const SizedBox(width: 20),
                 
@@ -222,14 +347,18 @@ class _WeatherScreenState extends State<WeatherScreen> {
                   children: [
                     Text(
                       weather.temperatureFormatted,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 64,
                         fontWeight: FontWeight.bold,
+                        color: isDark ? AppTheme.textPrimaryDark : AppTheme.textPrimaryLight,
                       ),
                     ),
                     Text(
                       weather.capitalizedDescription,
-                      style: const TextStyle(fontSize: 18),
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: isDark ? AppTheme.textSecondaryDark : AppTheme.textSecondaryLight,
+                      ),
                     ),
                   ],
                 ),
@@ -249,33 +378,37 @@ class _WeatherScreenState extends State<WeatherScreen> {
                 _buildDetailCard(
                   Icons.thermostat,
                   'Sensación',
-                  '${(weather.temperature + 2).round()}°C', // Simulado
+                  '${(weather.temperature + 2).round()}°C',
                   Colors.orange,
+                  isDark,
                 ),
                 _buildDetailCard(
                   Icons.water_drop,
                   'Humedad',
                   weather.humidityFormatted,
                   Colors.blue,
+                  isDark,
                 ),
                 _buildDetailCard(
                   Icons.air,
                   'Viento',
                   weather.windSpeedFormatted,
-                  Colors.grey,
+                  AppTheme.accentColor,
+                  isDark,
                 ),
                 _buildDetailCard(
                   Icons.compress,
                   'Presión',
-                  '1013 hPa', // Simulado
+                  '1013 hPa',
                   Colors.purple,
+                  isDark,
                 ),
               ],
             ),
             
             // Consejo según el clima
             const SizedBox(height: 24),
-            _buildWeatherAdvice(weather),
+            _buildWeatherAdvice(weather, isDark),
           ],
         ),
       ),
@@ -287,19 +420,25 @@ class _WeatherScreenState extends State<WeatherScreen> {
     String title,
     String value,
     Color color,
+    bool isDark,
   ) {
     return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      color: isDark ? AppTheme.surfaceDark : Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(icon, color: color),
+              child: Icon(icon, color: color, size: 22),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -311,14 +450,16 @@ class _WeatherScreenState extends State<WeatherScreen> {
                     title,
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.grey.shade600,
+                      color: isDark ? AppTheme.textSecondaryDark : AppTheme.textSecondaryLight,
                     ),
                   ),
+                  const SizedBox(height: 2),
                   Text(
                     value,
-                    style: const TextStyle(
-                      fontSize: 18,
+                    style: TextStyle(
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
+                      color: isDark ? AppTheme.textPrimaryDark : AppTheme.textPrimaryLight,
                     ),
                   ),
                 ],
@@ -330,15 +471,19 @@ class _WeatherScreenState extends State<WeatherScreen> {
     );
   }
 
-  Widget _buildWeatherAdvice(weather) {
+  Widget _buildWeatherAdvice(weather, bool isDark) {
     String advice = '';
-    Color color = Colors.blue;
+    Color color = AppTheme.primaryColor;
 
-    if (weather.description.contains('lluvia')) {
+    if (weather.description.contains('lluvia') ||
+        weather.description.contains('rain') ||
+        weather.description.contains('drizzle')) {
       advice = '¡Lleva paraguas! Va a llover hoy.';
       color = Colors.blue;
-    } else if (weather.description.contains('soleado') || 
-               weather.description.contains('despejado')) {
+    } else if (weather.description.contains('soleado') ||
+               weather.description.contains('despejado') ||
+               weather.description.contains('sunny') ||
+               weather.description.contains('clear')) {
       advice = 'Día perfecto para actividades al aire libre.';
       color = Colors.orange;
     } else if (weather.temperature < 10) {
@@ -355,20 +500,24 @@ class _WeatherScreenState extends State<WeatherScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+        color: color.withOpacity(isDark ? 0.2 : 0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: color.withOpacity(0.3),
+          width: 1.5,
+        ),
       ),
       child: Row(
         children: [
-          Icon(Icons.lightbulb_outline, color: color),
+          Icon(Icons.lightbulb_outline, color: color, size: 28),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               advice,
               style: TextStyle(
                 color: color,
-                fontWeight: FontWeight.bold,
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
@@ -377,22 +526,52 @@ class _WeatherScreenState extends State<WeatherScreen> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(bool isDark) {
     return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      color: isDark ? AppTheme.cardDark : Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(40),
         child: Column(
           children: [
-            const Icon(Icons.cloud_off, size: 80, color: Colors.grey),
+            Icon(
+              Icons.cloud_off,
+              size: 80,
+              color: isDark ? AppTheme.textSecondaryDark : AppTheme.textSecondaryLight,
+            ),
             const SizedBox(height: 20),
             Text(
               'Sin datos del clima',
-              style: Theme.of(context).textTheme.titleLarge,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: isDark ? AppTheme.textPrimaryDark : AppTheme.textPrimaryLight,
+              ),
             ),
-            const SizedBox(height: 8),
-            const Text(
+            const SizedBox(height: 12),
+            Text(
               'Busca una ciudad para ver el clima actual',
               textAlign: TextAlign.center,
+              style: TextStyle(
+                color: isDark ? AppTheme.textSecondaryDark : AppTheme.textSecondaryLight,
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () {
+                _cityController.text = 'Ecatepec de Morelos';
+                _searchWeather();
+              },
+              icon: const Icon(Icons.search),
+              label: const Text('Buscar mi ciudad'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              ),
             ),
           ],
         ),
@@ -400,16 +579,27 @@ class _WeatherScreenState extends State<WeatherScreen> {
     );
   }
 
-  Widget _buildCommonCities() {
-    final cities = ['Ecatepec de Morelos', 'Puebla', 'Monterrey', 'Guerrero', 'Tijuana'];
+  Widget _buildCommonCities(bool isDark) {
+    final cities = [
+      'Ecatepec de Morelos',
+      'Ciudad de México',
+      'Puebla',
+      'Monterrey',
+      'Guadalajara',
+      'Cancún',
+      'Tijuana',
+      'Mérida'
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Ciudades Populares',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: isDark ? AppTheme.textPrimaryDark : AppTheme.textPrimaryLight,
           ),
         ),
         const SizedBox(height: 12),
@@ -418,11 +608,30 @@ class _WeatherScreenState extends State<WeatherScreen> {
           runSpacing: 8,
           children: cities.map((city) {
             return FilterChip(
-              label: Text(city),
+              label: Text(
+                city,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: isDark ? Colors.white : AppTheme.primaryColor,
+                ),
+              ),
               onSelected: (_) {
                 _cityController.text = city;
                 _searchWeather();
               },
+              backgroundColor: isDark
+                  ? AppTheme.primaryColor.withOpacity(0.2)
+                  : AppTheme.primaryColor.withOpacity(0.1),
+              selectedColor: AppTheme.primaryColor,
+              checkmarkColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(
+                  color: AppTheme.primaryColor.withOpacity(0.3),
+                  width: 1,
+                ),
+              ),
             );
           }).toList(),
         ),

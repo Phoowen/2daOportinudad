@@ -34,6 +34,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
   bool _isLoading = false;
   String? _error;
   bool _initialLoadComplete = false;
+  bool _hasChanges = false;
 
   @override
   void initState() {
@@ -113,7 +114,10 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
     );
 
     if (pickedDate != null && mounted) {
-      setState(() => _selectedDate = pickedDate);
+      setState(() {
+        _selectedDate = pickedDate;
+        _hasChanges = true;
+      });
     }
   }
 
@@ -128,7 +132,10 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
     );
 
     if (pickedTime != null && mounted) {
-      setState(() => _selectedTime = pickedTime);
+      setState(() {
+        _selectedTime = pickedTime;
+        _hasChanges = true;
+      });
     }
   }
 
@@ -214,22 +221,114 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
     }
   }
 
+  void _checkForChanges() {
+    final taskProvider = context.read<TaskProvider>();
+     final originalTask = widget.isEditing && widget.taskId != null
+      ? taskProvider.tasks.firstWhere(
+          (task) => task.id == widget.taskId,
+          orElse: () => TaskModel(
+            id: 0,
+            userId: 0,
+            titulo: '',
+            descripcion: '',
+            prioridad: Priority.media,
+            estado: Status.pendiente,
+            fechaCreacion: DateTime.now(),
+          ),
+        )
+      : null;
+
+    if (originalTask == null) {
+      _hasChanges = _tituloController.text.isNotEmpty ||
+          _descripcionController.text.isNotEmpty ||
+          _selectedPriority != Priority.media ||
+          _selectedStatus != Status.pendiente ||
+          _selectedDate != null;
+    } else {
+      _hasChanges = _tituloController.text != originalTask.titulo ||
+          _descripcionController.text != originalTask.descripcion ||
+          _selectedPriority != originalTask.prioridad ||
+          _selectedStatus != originalTask.estado ||
+          _selectedDate != originalTask.fechaLimite ||
+          (_selectedDate != null && _selectedTime != null &&
+              TimeOfDay.fromDateTime(originalTask.fechaLimite!) != _selectedTime);
+    }
+  }
+
+  Future<bool> _onWillPop() async {
+    _checkForChanges();
+    
+    if (_hasChanges) {
+      final result = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('¿Descartar cambios?'),
+          content: const Text('Tienes cambios sin guardar. ¿Estás seguro de que quieres salir?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red,
+              ),
+              child: const Text('Descartar'),
+            ),
+          ],
+        ),
+      );
+      
+      return result ?? false;
+    }
+    
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.isEditing ? 'Editar Tarea' : 'Nueva Tarea'),
-        actions: [
-          if (widget.isEditing)
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
+        
+        final shouldPop = await _onWillPop();
+        if (shouldPop && mounted) {
+          context.pop();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          // ⭐⭐ BOTÓN DE BACK AGREGADO ⭐⭐
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () async {
+              final shouldPop = await _onWillPop();
+              if (shouldPop && mounted) {
+                context.pop();
+              }
+            },
+          ),
+          title: Text(widget.isEditing ? 'Editar Tarea' : 'Nueva Tarea'),
+          actions: [
+            if (widget.isEditing)
+              IconButton(
+                icon: const Icon(Icons.delete),
+                onPressed: _showDeleteDialog,
+                tooltip: 'Eliminar tarea',
+              ),
             IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: _showDeleteDialog,
+              icon: const Icon(Icons.save),
+              onPressed: _saveTask,
+              tooltip: 'Guardar tarea',
             ),
-        ],
+          ],
+        ),
+        body: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _buildForm(),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _buildForm(),
     );
   }
 
@@ -238,6 +337,13 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
       padding: const EdgeInsets.all(16),
       child: Form(
         key: _formKey,
+        onChanged: () {
+          if (mounted) {
+            setState(() {
+              _hasChanges = true;
+            });
+          }
+        },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -255,6 +361,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                 border: OutlineInputBorder(),
               ),
               maxLength: 200,
+              onChanged: (_) => _hasChanges = true,
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
                   return 'El título es requerido';
@@ -281,6 +388,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
               maxLines: 5,
               maxLength: 1000,
               keyboardType: TextInputType.multiline,
+              onChanged: (_) => _hasChanges = true,
             ),
             const SizedBox(height: 20),
             
@@ -319,7 +427,10 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                         }).toList(),
                         onChanged: (value) {
                           if (value != null) {
-                            setState(() => _selectedPriority = value);
+                            setState(() {
+                              _selectedPriority = value;
+                              _hasChanges = true;
+                            });
                           }
                         },
                       ),
@@ -360,7 +471,10 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                         }).toList(),
                         onChanged: (value) {
                           if (value != null) {
-                            setState(() => _selectedStatus = value);
+                            setState(() {
+                              _selectedStatus = value;
+                              _hasChanges = true;
+                            });
                           }
                         },
                       ),
@@ -394,6 +508,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                               setState(() {
                                 _selectedDate = null;
                                 _selectedTime = null;
+                                _hasChanges = true;
                               });
                             },
                             child: const Text('Eliminar'),
@@ -481,7 +596,12 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () => context.go('/tasks'),
+                    onPressed: () async {
+                      final shouldPop = await _onWillPop();
+                      if (shouldPop && mounted) {
+                        context.go('/tasks');
+                      }
+                    },
                     child: const Text('Cancelar'),
                   ),
                 ),
