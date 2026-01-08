@@ -28,18 +28,18 @@ Instalación
 
 bash
 # 1. Clonar repositorio
-git clone https://github.com/tu-usuario/taskmaster-app.git
+git clone https://github.com/Phoowen/2daOportinudad.git
 cd taskmaster-app
 
 # 2. Configurar Backend
-cd backend
+cd nOWte.app_backend
 cp .env.example .env
 # Editar .env con tus credenciales
 npm install
 npm start
 
 # 3. Configurar Frontend
-cd ../frontend
+cd ../nOWte_app
 cp .env.example .env
 # Agregar tus API Keys
 flutter pub get
@@ -97,7 +97,7 @@ flutter build apk --release
 flutter build ios --release
 flutter build web --release
 
-📖 API Documentation
+## 📖 API Documentation
 Endpoints Principales
 Método	Endpoint	Descripción	Autenticación
 POST	/api/auth/register	Registrar nuevo usuario	❌
@@ -158,11 +158,11 @@ Content-Type: application/json
 ## 👥 Credenciales de Prueba ##
 yaml
 # Usuario de prueba (se crea automáticamente en primera ejecución)
-Email: ejemplocorreo@gmail.com
-Password: 123456
-// (En caso de no funcionar ese usuario, crear uno nuevo o usar el siguiente) //
-Email: ozarate025@gmail.com
-Password: ZowenZ2525
+# Email: ejemplocorreo@gmail.com
+# Password: 123456
+## // (En caso de no funcionar ese usuario, crear uno nuevo o usar el siguiente) //
+# Email: ozarate025@gmail.com
+# Password: ZowenZ2525
 
 📊 Base de Datos
 <details> <summary>Ver esquema completo</summary>
