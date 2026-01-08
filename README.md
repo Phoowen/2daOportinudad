@@ -14,7 +14,7 @@ Autenticación: JWT (JSON Web Token)
 - Github
 - Flutter
 
-✨ Características Principales
+## ✨ Características Principales ##
 Funcionalidad	Descripción	Estado
 📝 Gestión de Tareas	CRUD completo con prioridades y estados	✅ Completo
 👤 Autenticación	Registro y login con JWT seguro	✅ Completo
@@ -154,7 +154,8 @@ Content-Type: application/json
   "fecha_limite": "2024-12-31T23:59:59Z"
 }
 </details>
-👥 Credenciales de Prueba
+
+## 👥 Credenciales de Prueba ##
 yaml
 # Usuario de prueba (se crea automáticamente en primera ejecución)
 Email: ejemplocorreo@gmail.com
